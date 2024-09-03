@@ -1380,9 +1380,8 @@ ParmParse::query (const char* name, long& ref, int ival) const
     return squeryval(*m_table,m_parser_prefix, prefixedName(name),ref,ival, LAST);
 }
 
-// NOLINT(readability-make-member-function-const)
 void
-ParmParse::add (const char* name,
+ParmParse::add (const char* name, // NOLINT(readability-make-member-function-const)
                 const long  val)
 {
     saddval(prefixedName(name),val);
@@ -1681,8 +1680,7 @@ ParmParse::queryarr (const char* name, std::vector<std::string>& ref,
 }
 
 void
-// NOLINT(readability-make-member-function-const)
-ParmParse::addarr (const char* name, const std::vector<std::string>& ref)
+ParmParse::addarr (const char* name, const std::vector<std::string>& ref) // NOLINT(readability-make-member-function-const)
 {
     saddarr(prefixedName(name),ref);
 }
