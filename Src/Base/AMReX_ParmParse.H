@@ -348,7 +348,7 @@ public:
                bool&       ref,
                int         ival = FIRST) const;
     //! Add a key 'name'with value 'ref' to the end of the PP table.
-    void add (const char* name, bool val);
+    void add (const char* name, bool val); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Get the ival'th value of kth occurrence of the requested name.
     * If successful, the value is converted to an int and stored
@@ -383,7 +383,7 @@ public:
                int&        ref,
                int         ival = FIRST) const;
     //! Add a key 'name'with value 'ref' to the end of the PP table.
-    void add (const char* name, int  val);
+    void add (const char* name, int  val); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Get the ival'th value of kth occurrence of the requested name.
     * If successful, the value is converted to an int and stored
@@ -417,7 +417,7 @@ public:
                long&        ref,
                int         ival = FIRST) const;
     //! Add a key 'name'with value 'ref' to the end of the PP table.
-    void add (const char* name, long  val);
+    void add (const char* name, long  val); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Get the ival'th value of kth occurrence of the requested name.
     * If successful, the value is converted to an int and stored
@@ -451,7 +451,7 @@ public:
                long long&  ref,
                int         ival = FIRST) const;
     //! Add a key 'name'with value 'ref' to the end of the PP table.
-    void add (const char* name, long long  val);
+    void add (const char* name, long long  val); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Get the ival'th value of kth occurrence of the requested name.
     * If successful, the value is converted to a float and stored
@@ -485,7 +485,7 @@ public:
                float&      ref,
                int         ival = FIRST) const;
     //! Add a key 'name'with value 'ref' to the end of the PP table.
-    void add (const char* name, float  val);
+    void add (const char* name, float  val); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Get the ival'th value of kth occurrence of the requested name.
     * If successful, the value is converted to a double and stored
@@ -519,7 +519,7 @@ public:
                double&     ref,
                int         ival = FIRST) const;
     //! Add a key 'name'with value 'ref' to the end of the PP table.
-    void add (const char* name, double val);
+    void add (const char* name, double val); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Get the ival'th value of kth occurrence of the requested name.
     * If successful, the value is converted to a std::string and stored
@@ -554,7 +554,7 @@ public:
                std::string& ref,
                int          ival = FIRST) const;
     //! Add a key 'name'with value 'ref' to the end of the PP table.
-    void add (const char* name, const std::string& val);
+    void add (const char* name, const std::string& val); // NOLINT(readability-make-member-function-const)
 
     /**
     * \brief Get the ival'th value of kth occurrence of the requested name.
@@ -589,7 +589,7 @@ public:
                IntVect&    ref,
                int         ival = FIRST) const;
     //! Add a key 'name'with value 'ref' to the end of the PP table.
-    void add (const char* name, const IntVect& val);
+    void add (const char* name, const IntVect& val); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Get the ival'th value of kth occurrence of the requested name.
     * If successful, the value is converted to a Box and stored
@@ -623,7 +623,7 @@ public:
                Box&        ref,
                int         ival = FIRST) const;
     //! Add a key 'name'with value 'ref' to the end of the PP table.
-    void add (const char* name, const Box& val);
+    void add (const char* name, const Box& val); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Gets an std::vector\<int\> of num_val values from kth occurrence of
     * given name.  If successful, the values are converted to an int
@@ -658,7 +658,7 @@ public:
                   int               start_ix = FIRST,
                   int               num_val = ALL) const;
     //! Add a key 'name' with vector of values 'ref' to the end of the PP table.
-    void addarr (const char* name, const std::vector<int>& ref);
+    void addarr (const char* name, const std::vector<int>& ref); // NOLINT(readability-make-member-function-const)
 
     /**
     * \brief Gets an std::vector\<long\> of num_val values from kth occurrence of
@@ -694,7 +694,7 @@ public:
                   int                start_ix = FIRST,
                   int                num_val = ALL) const;
     //! Add a key 'name' with vector of values 'ref' to the end of the PP table.
-    void addarr (const char* name, const std::vector<long>& ref);
+    void addarr (const char* name, const std::vector<long>& ref); // NOLINT(readability-make-member-function-const)
 
     /**
     * \brief Gets an std::vector\<long long\> of num_val values from kth occurrence of
@@ -730,7 +730,7 @@ public:
                   int                     start_ix = FIRST,
                   int                     num_val = ALL) const;
     //! Add a key 'name' with vector of values 'ref' to the end of the PP table.
-    void addarr (const char* name, const std::vector<long long>& ref);
+    void addarr (const char* name, const std::vector<long long>& ref); // NOLINT(readability-make-member-function-const)
 
     /**
     * \brief Gets an std::vector\<float\> of num_val values from kth occurrence of
@@ -766,7 +766,7 @@ public:
                   int                 start_ix = FIRST,
                   int                 num_val = ALL) const;
     //! Add a key 'name' with vector of values 'ref' to the end of the PP table.
-    void addarr (const char* name, const std::vector<float>& ref);
+    void addarr (const char* name, const std::vector<float>& ref); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Gets an std::vector\<double\> of num_val values from kth occurrence of
     * given name.  If successful, the values are converted to a double
@@ -801,7 +801,7 @@ public:
                   int                  start_ix = FIRST,
                   int                  num_val = ALL) const;
     //! Add a key 'name' with vector of values 'ref' to the end of the PP table.
-    void addarr (const char* name, const std::vector<double>& ref);
+    void addarr (const char* name, const std::vector<double>& ref); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Gets an std::vector<std::string> of num_val values from kth occurrence of
     * given name.  If successful, the values are converted to an
@@ -836,7 +836,7 @@ public:
                   int                       start_ix = FIRST,
                   int                       num_val = ALL) const;
     //! Add a key 'name' with vector of values 'ref' to the end of the PP table.
-    void addarr (const char* name, const std::vector<std::string>& ref);
+    void addarr (const char* name, const std::vector<std::string>& ref); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Gets an std::vector\<IntVect\> of num_val values from kth occurrence of
     * given name.  If successful, the values are converted to an
@@ -871,7 +871,7 @@ public:
                   int                   start_ix = FIRST,
                   int                   num_val = ALL) const;
     //! Add a key 'name' with vector of values 'ref' to the end of the PP table.
-    void addarr (const char* name, const std::vector<IntVect>& ref);
+    void addarr (const char* name, const std::vector<IntVect>& ref); // NOLINT(readability-make-member-function-const)
     /**
     * \brief Gets an std::vector\<Box\> of num_val values from kth occurrence of
     * given name.  If successful, the values are converted to an
@@ -906,7 +906,7 @@ public:
                   int               start_ix = FIRST,
                   int               num_val = ALL) const;
     //! Add a key 'name' with vector of values 'ref' to the end of the PP table.
-    void addarr (const char* name, const std::vector<Box>& refd);
+    void addarr (const char* name, const std::vector<Box>& refd); // NOLINT(readability-make-member-function-const)
 
     /*
      * \brief Query IntVect from array
