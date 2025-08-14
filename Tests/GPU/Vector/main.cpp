@@ -2,114 +2,72 @@
 #include <AMReX_Gpu.H>
 #include <AMReX_GpuContainers.H>
 #include <AMReX_ParmParse.H>
-#include <AMReX_GpuPrint.H>
-
-using namespace amrex;
-
-// v3 should contain the integers from -5 to 5, inclusive
-template <template <typename> class Container>
-typename std::enable_if<RunOnGpu<typename Container<int>::allocator_type>::value>::type
-checkV3 (const Container<int>& c)
-{
-    const auto c_ptr = c.dataPtr();
-    amrex::ParallelFor(11, [=] AMREX_GPU_DEVICE (const int index) noexcept {
-            AMREX_ALWAYS_ASSERT(c_ptr[index] == index-5);
-        });
-    Gpu::Device::streamSynchronize();
-}
-
-// v3 should contain the integers from -5 to 5, inclusive
-template <template <typename> class Container>
-typename std::enable_if<!RunOnGpu<typename Container<int>::allocator_type>::value>::type
-checkV3 (const Container<int>& c)
-{
-    for (int i=-5, index=0; i <= 5; ++i, ++index)
-    {
-        AMREX_ALWAYS_ASSERT(c[index] == i);
-    }
-}
-
-template <template <typename> class Container>
-void test_container()
-{
-    Container<int> v = {1, 2, 4};
-    v.insert(v.begin(), 0);
-    v.insert(v.begin() + 3, 3);
-    v.insert(v.end(), 5);
-    v.insert(v.begin(), {-2, -1});
-
-    Container<int> v2;
-    v2.push_back(-5);
-    v2.push_back(-4);
-    v2.push_back(-3);
-    v.insert(v.begin(), v2.begin(), v2.end());
-
-    v.insert(v.begin(),1,-6);
-    v.insert(v.end(), 2, 6);
-    v.erase(v.end()-1, v.end());
-
-    v.pop_back();
-    v.erase(v.begin(), v.begin()+1);
-
-    Container<int> v3;
-    v3.assign(v.begin(), v.end());
-
-    checkV3<Container>(v3);
-}
-
-void async_test()
-{
-    {
-        int N = 32*10;  // 10 warps. Arbitrarily chosen.
-
-        Gpu::AsyncVector<Real> vec(N, 0.0);
-        auto ptr = vec.dataPtr();
-
-        // Compute-bound test. Should take some time.
-        amrex::ParallelFor(N, [=] AMREX_GPU_DEVICE (int n) noexcept
-        {
-            Real y = ptr[n];
-            Real x = 1.0;
-            for (int n = 0; n < 20; ++n) {
-                Real dx = -(x*x-y) / (2.*x);
-                x += dx;
-            }
-            ptr[n] = x;
-
-            if (n == 0)
-#ifdef AMREX_USE_GPU
-                { AMREX_DEVICE_PRINTF(" Answer = %1.16f -- should print second.\n", ptr[n]); }
-#else
-                { std::cout << "Answer = " << ptr[n] << " -- should print first." << '\n'; }
-#endif
-
-        });
-    }
-
-    // Async Vector now out of scope. Still completes correctly.
-
-#ifdef AMREX_USE_GPU
-    amrex::Print() << "Async Syncing -- should print first." << '\n';
-#else
-    amrex::Print() << "Async Syncing -- should print second." << '\n';
-#endif
-
-    Gpu::Device::streamSynchronize();
-}
+#include <AMReX_MultiFab.H>
 
 int main (int argc, char* argv[])
 {
     amrex::Initialize(argc,argv);
     {
-        test_container<Gpu::DeviceVector >();
-        test_container<Gpu::HostVector   >();
-        test_container<Gpu::ManagedVector>();
-        test_container<Gpu::PinnedVector> ();
-        test_container<Gpu::AsyncVector>  ();
+      amrex::ParmParse pp;
+      int grid_size = 128, max_box_size = 32;
+      pp.query("grid_size", grid_size);
+      pp.query("max_box_size", max_box_size);
+      bool use_constant = false;
+      pp.query("use_constant", use_constant);
+      amrex::Real constant_value = 9.0;
+      if (use_constant) {
+	pp.query("constant_value", constant_value);
+      }
 
-        async_test();
+      const amrex::Box domain(amrex::IntVect(0), amrex::IntVect(grid_size - 1));
+      const amrex::RealBox real_dom(amrex::RealVect(0.0).begin(), amrex::RealVect(1.0).begin());
+      const int coord = 0;
+      const amrex::Array<int,AMREX_SPACEDIM> is_per({AMREX_D_DECL(1,1,1)});
+      amrex::Geometry geom(domain, real_dom, coord, is_per);
+      amrex::BoxArray ba(domain);
+      ba.maxSize(max_box_size);
+      amrex::DistributionMapping dm{ba};
+      const int num_grow = 0;
+      const int num_comp = 2;
+      amrex::MultiFab data(ba, dm, num_comp, num_grow);
+      data.setVal(0.0,0,1); // set 1st component to 1
+      data.setVal(1.0,1,1); // set 2nd component to 2
 
-        amrex::Print() << "Passed! \n";
+      const bool hard_coded_use_constant = false;
+    amrex::Print() << "Starting test 1\n";
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (Gpu::notInLaunchRegion())
+#endif
+    for (amrex::MFIter mfi(data, amrex::TilingIfNotGPU()); mfi.isValid();
+         ++mfi) {
+      const amrex::Box& bx = mfi.tilebox();
+      auto const& var_in_arr = data.const_array(mfi,0);
+      auto const& var_out_arr = data.array(mfi,1);
+      
+      amrex::ParallelFor(
+        bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) noexcept {
+	  const amrex::Real set_val = hard_coded_use_constant ? constant_value : var_in_arr(i,j,k);
+	  var_out_arr(i,j,k) = set_val;
+        });
+    }
+    amrex::Print() << "Passed test 1, starting test 2 \n";
+      
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (Gpu::notInLaunchRegion())
+#endif
+    for (amrex::MFIter mfi(data, amrex::TilingIfNotGPU()); mfi.isValid();
+         ++mfi) {
+      const amrex::Box& bx = mfi.tilebox();
+      auto const& var_in_arr = data.const_array(mfi,0);
+      auto const& var_out_arr = data.array(mfi,1);
+      
+      amrex::ParallelFor(
+        bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) noexcept {
+	  const amrex::Real set_val = use_constant ? constant_value : var_in_arr(i,j,k);
+	  var_out_arr(i,j,k) = set_val;
+        });
+    }
+    amrex::Print() << "Passed test 2 \n";
     }
     amrex::Finalize();
 }
