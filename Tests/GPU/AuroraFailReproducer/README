@@ -1,0 +1,12 @@
+Should be set up to minimally reproduce the error we've seen in PeleLMeX.
+
+Compile: "make -j"
+
+Run: "./main3d.sycl.MPI.ex"
+
+This code just has two loops that copy data within an AMReX multifab. In both loops,
+a the second component of the multifab is filled either by copying the contents of
+the first component or by setting a constant value, with a boolean flag that indicates
+which option will be used. In the first loop, the boolean flag is hard coded as a const,
+which works. In the second loop, it can be set at runtime by the user. This causes
+the code to segfault.
