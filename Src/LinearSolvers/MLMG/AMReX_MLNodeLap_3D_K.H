@@ -5866,6 +5866,12 @@ void mlndlap_set_stencil_eb (int i, int j, int k, Array4<Real> const& sten,
 
     // i+1,j+1,k+1
     sten(i,j,k,ist_ppp) = sig(i,j,k) * (facx*conn(i,j,k,i_c_ybzb) + facy*conn(i,j,k,i_c_xbzb) + facz*conn(i,j,k,i_c_xbyb) );
+    
+    for (int n = ist_p00; n <= ist_ppp; n++) {
+      if (sten(i,j,k,n) < 0.0) {
+        sten(i,j,k,n) *= 1e-2;
+      }
+    }
 }
 
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
